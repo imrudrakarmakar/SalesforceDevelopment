@@ -22,7 +22,7 @@ trigger Account_Trigger on Account (before insert, before update, before delete,
             }
         } else if (Trigger.isUpdate) {
             if (!UTL_TriggerControl.isTriggerDisabled('Account_BeforeUpdate')) {
-                AccountTriggerHandler.beforeUpdate(Trigger.new, Trigger.oldMap);
+                AccountTriggerHandler.distributeBudgetAmongOpportunities(Trigger.new, Trigger.oldMap);
             }
         } else if (Trigger.isDelete) {
             if (!UTL_TriggerControl.isTriggerDisabled('Account_BeforeDelete')) {

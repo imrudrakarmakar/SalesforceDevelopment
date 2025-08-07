@@ -59,6 +59,60 @@ public with sharing class AccountTriggerHandler {
         }
     }
 
+    public static void distributeBudgetAmongOpportunities(List<Account> newList, Map<Id, Account> oldMap) {
+        if (UTL_TriggerControl.isTriggerDisabled('ACC003')) return;
+
+        Set<Id> accountIdsToUpdate = new Set<Id>();
+        Map<Id, Decimal> updatedAccountBudgets = new Map<Id, Decimal>();
+
+        for (Account acc : newList) {
+            Account oldAcc = oldMap.get(acc.Id);
+            if (acc.Total_Budget__c != oldAcc.Total_Budget__c) {
+                accountIdsToUpdate.add(acc.Id);
+                updatedAccountBudgets.put(acc.Id, acc.Total_Budget__c);
+            }
+        }
+        
+        if (accountIdsToUpdate.isEmpty()) return;
+
+        // Fetch related Opportunities
+        Map<Id, List<Opportunity>> accIdToOppsMap = new Map<Id, List<Opportunity>>();
+        List<Opportunity> opportunities = [
+            SELECT Id, AccountId, Budget__c
+            FROM Opportunity
+            WHERE AccountId IN :accountIdsToUpdate
+        ];
+
+        for (Opportunity opp : opportunities) {
+            if (!accIdToOppsMap.containsKey(opp.AccountId)) {
+                accIdToOppsMap.put(opp.AccountId, new List<Opportunity>());
+            }
+            accIdToOppsMap.get(opp.AccountId).add(opp);
+        }
+
+        // Prepare updated Opportunities
+        Map<Id, Decimal> perOpportunityBudget = new Map<Id, Decimal>();
+        for (Id accId : updatedAccountBudgets.keySet()) {
+            if(accIdToOppsMap.containsKey(accId)) {
+                Integer oppCount = accIdToOppsMap.get(accId).size();
+                if(oppCount > 0) {
+                    perOpportunityBudget.put(accId, updatedAccountBudgets.get(accId) / oppCount);
+                }
+            }
+        }
+        List<Opportunity> opportunitiesToUpdate = new List<Opportunity>();
+        for (Opportunity opp : opportunities) {
+            if(perOpportunityBudget.containsKey(opp.AccountId)) {
+                opp.Budget__c = perOpportunityBudget.get(opp.AccountId);
+                opportunitiesToUpdate.add(opp);
+            }
+        }
+
+        if (!opportunitiesToUpdate.isEmpty()) {
+            update opportunitiesToUpdate;
+        }
+    }
+
     public static void beforeUpdate(List<Account> accList, Map<Id, Account> oldMap) {}
     public static void beforeDelete(Map<Id, Account> oldMap) {}
     public static void afterInsert(List<Account> accList) {}
