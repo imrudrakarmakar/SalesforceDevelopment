@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TRG_Triggers_To_Disable_List__c</fullName>
+    <inlineHelpText>List the trigger names to be disabled, separated by a semicolon.</inlineHelpText>
+    <label>Triggers To Disable List</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>TextArea</type>
+</CustomField>

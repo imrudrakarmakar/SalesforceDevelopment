@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TRG_Persistent_Debug_Logs__c</fullName>
+    <defaultValue>false</defaultValue>
+    <inlineHelpText>Set this checkbox to true if you want to see the Trigger Info in the LOG Message table as Debug Level.</inlineHelpText>
+    <label>Persistent Debug Logs</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>
