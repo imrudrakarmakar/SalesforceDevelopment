@@ -8,7 +8,7 @@
  *                      and undelete operations.
  * @author            : imrudrakarmakar
  * @group             : 
- * @last modified on  : 08-07-2025
+ * @last modified on  : 08-08-2025
  * @last modified by  : imrudrakarmakar
 **/
 trigger Account_Trigger on Account (before insert, before update, before delete, after insert, after update, after delete,  after undelete) {
@@ -26,7 +26,7 @@ trigger Account_Trigger on Account (before insert, before update, before delete,
             }
         } else if (Trigger.isDelete) {
             if (!UTL_TriggerControl.isTriggerDisabled('Account_BeforeDelete')) {
-                AccountTriggerHandler.beforeDelete(Trigger.oldMap);
+                AccountTriggerHandler.preventAccountDeletionIfConactIsPotentialBuyer(Trigger.old);
             }
         }
     } else if (Trigger.isAfter) {

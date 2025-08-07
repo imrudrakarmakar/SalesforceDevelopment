@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : imrudrakarmakar
  * @group             : 
- * @last modified on  : 08-07-2025
+ * @last modified on  : 08-08-2025
  * @last modified by  : imrudrakarmakar
 **/
 public with sharing class AccountTriggerHandler {
@@ -30,6 +30,35 @@ public with sharing class AccountTriggerHandler {
             }
         }
     }
+
+    public static void preventAccountDeletionIfConactIsPotentialBuyer(List<Account> oldAccounts) {
+        if (UTL_TriggerControl.isTriggerDisabled('ACC002')) return;
+        
+        if (oldAccounts == null || oldAccounts.isEmpty()) return;
+
+        Set<Id> accountIds = new Set<Id>();
+        for (Account acc : oldAccounts) {
+            accountIds.add(acc.Id);
+        }
+
+        // Query contacts marked as potential buyer
+        Set<Id> accountsWithBuyers = new Set<Id>();
+        for (Contact con : [
+            SELECT Id, AccountId
+            FROM Contact
+            WHERE AccountId IN :accountIds AND Potential_Buyer__c = true
+        ]) {
+            accountsWithBuyers.add(con.AccountId);
+        }
+
+        // Add error to accounts that have potential buyer contacts
+        for (Account acc : oldAccounts) {
+            if (accountsWithBuyers.contains(acc.Id)) {
+                acc.addError('Cannot delete this Account as it has at least one Contact marked as a Potential Buyer.');
+            }
+        }
+    }
+
     public static void beforeUpdate(List<Account> accList, Map<Id, Account> oldMap) {}
     public static void beforeDelete(Map<Id, Account> oldMap) {}
     public static void afterInsert(List<Account> accList) {}
