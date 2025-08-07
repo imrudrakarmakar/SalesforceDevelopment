@@ -6,10 +6,12 @@
  * @last modified by  : imrudrakarmakar
 **/
 public with sharing class AccountTriggerHandler {
-    public static void beforeInsert(List<Account> accList) {
+    
+    public static void preventDuplicateAccount(List<Account> accList) {
 
         if (UTL_TriggerControl.isTriggerDisabled('ACC001')) return;
 
+        // Collect all new account names
         Set<String> newAccountNames = new Set<String>();
         for(Account acc : accList) {
             newAccountNames.add(acc.Name);

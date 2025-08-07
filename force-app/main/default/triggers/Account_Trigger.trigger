@@ -18,7 +18,7 @@ trigger Account_Trigger on Account (before insert, before update, before delete,
     if (Trigger.isBefore) {
         if (Trigger.isInsert) {
             if (!UTL_TriggerControl.isTriggerDisabled('Account_BeforeInsert')) {
-                AccountTriggerHandler.beforeInsert(Trigger.new);
+                AccountTriggerHandler.preventDuplicateAccount(Trigger.new);
             }
         } else if (Trigger.isUpdate) {
             if (!UTL_TriggerControl.isTriggerDisabled('Account_BeforeUpdate')) {
